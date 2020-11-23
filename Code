@@ -1,0 +1,89 @@
+import datetime
+import smtplib 
+
+def encrypt(pt):
+    s = smtplib.SMTP('smtp.gmail.com', 587) 
+    s.starttls() 
+    x = datetime.datetime.now()
+#    print(x)
+    y = x.year
+    m = x.month
+    d = x.day
+    h = x.hour
+    mi = x.minute
+    Y = str(y)
+    M = str(m)
+    D = str(d)
+    H = str(h)
+    MI = str(mi)
+    l1 = []
+    l2 = []
+    l3 = []
+    key1 = Y+M+D+H+MI
+    s.login("sampleemail@gmail.com", "Password")
+#    print(key1)
+
+    key = list(key1)
+    if len(pt) == len(key):
+        print(key)
+    else:
+        for i in range(len(pt)-len(key)):
+            key.append(key[i % len(key)])
+
+    fkey = "".join(key)     
+#    print(fkey)
+
+    for i in fkey:
+        l1.append(ord(i))
+#    print(l1)
+
+
+    for i in pt:
+        l2.append(ord(i))
+#    print(l2)
+
+    for i in range(len(l2)):
+        c = int(l1[i])+int(l2[i])
+        c1 = (c % 26) + 97
+        l3.append(chr(c1))
+#    print(l3)
+
+    ct = ""
+    for i in range(len(l3)):
+        ct = ct+l3[i]
+    print(ct)
+    message = ct
+    s.sendmail("sample sender email@gmail.com", "sample receiver email", message) 
+    s.quit() 
+    return
+
+def decrypt(ct,key2):
+    key = list(key2)
+    if len(ct) == len(key):
+        print(key)
+    else:
+        for i in range(len(ct)-len(key)):
+            key.append(key[i % len(key)])
+            
+    ckey = "".join(key)
+    print(ckey)
+    orig_text = [] 
+    for i in range(len(ct)): 
+        x = (ord(ct[i]) - 
+             ord(key[i]) + 40) % 26
+        x += ord("a") 
+        orig_text.append(chr(x)) 
+    return("" . join(orig_text))
+
+
+
+choice = input("encrypt(e) or decrypt(d) :")
+if choice=="e":
+    text = input("Enter the plaintext: ")
+    encrypt(text)
+elif choice=="d":
+    text = input("Enter the ciphertext:")
+    keys = input("Enter the key:")
+    print("plain text is: ", decrypt(text,keys))
+else:
+    print("select valid option..")
